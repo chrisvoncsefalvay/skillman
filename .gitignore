@@ -148,7 +148,6 @@ Desktop.ini
 $RECYCLE.BIN/
 
 # GitHub metadata (keep workflows/templates tracked)
-.github/
 !.github/workflows/
 !.github/ISSUE_TEMPLATE/
 !.github/pull_request_template.md

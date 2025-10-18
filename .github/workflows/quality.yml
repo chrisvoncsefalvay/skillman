@@ -1,0 +1,81 @@
+name: Code Quality Checks
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Check with black
+        run: black skillman --check --diff
+        continue-on-error: true
+
+      - name: Lint with flake8
+        run: |
+          flake8 skillman --count --statistics --show-source
+        continue-on-error: true
+
+      - name: Type check with mypy
+        run: mypy skillman --ignore-missing-imports
+        continue-on-error: true
+
+      - name: Security check with bandit
+        run: |
+          pip install bandit
+          bandit -r skillman -f json -o bandit-report.json || true
+          cat bandit-report.json
+        continue-on-error: true
+
+      - name: Verify package metadata
+        run: |
+          pip install twine
+          python -m build
+          twine check dist/*
+
+  dependencies:
+    name: Check Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Check for security vulnerabilities
+        run: |
+          pip install safety
+          pip install -e .
+          safety check --json || true
+        continue-on-error: true
+
+      - name: Check for outdated dependencies
+        run: |
+          pip install pip-audit
+          pip-audit || true
+        continue-on-error: true

@@ -1,0 +1,101 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Extract changelog from tag or generate from commit history
+          TAG=${{ github.ref_name }}
+          PREV_TAG=$(git describe --tags --abbrev=0 $TAG^ 2>/dev/null || echo "")
+
+          if [ -z "$PREV_TAG" ]; then
+            # First release - get all commits
+            CHANGELOG=$(git log --oneline --pretty=format:"- %h: %s" HEAD | head -20)
+          else
+            # Get commits since previous tag
+            CHANGELOG=$(git log --oneline --pretty=format:"- %h: %s" $PREV_TAG..$TAG)
+          fi
+
+          # Store in environment variable for use in release
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+          body: |
+            # Skillman ${{ github.ref_name }}
+
+            ## What's New
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ## Installation
+
+            ### Recommended (uv)
+            ```bash
+            uv tool install skillman
+            ```
+
+            ### With pip
+            ```bash
+            pip install skillman
+            ```
+
+            ### With pipx
+            ```bash
+            pipx install skillman
+            ```
+
+            ## Release Assets
+
+            - **skillman-*.whl** - Python wheel (recommended for pip)
+            - **skillman-*.tar.gz** - Source distribution
+            - **skillman-source.zip** - Source code archive
+            - **skillman-distributions.zip** - All Python distributions
+            - **skillman-${{ github.ref_name }}-full.zip** - Complete package with docs
+            - **CHECKSUMS.txt** - SHA256 checksums for verification
+            - **MANIFEST.txt** - Release manifest and installation guide
+
+            ## Verification
+
+            Verify package integrity:
+            ```bash
+            sha256sum -c CHECKSUMS.txt
+            ```
+
+            ## Documentation
+
+            - [README](https://github.com/chrisvoncsefalvay/skillman#readme)
+            - [Installation Guide](https://github.com/chrisvoncsefalvay/skillman/blob/main/README.md#installation)
+            - [PyPI Publishing Guide](https://github.com/chrisvoncsefalvay/skillman/blob/main/PUBLISHING.md)
+            - [UV Quick Start](https://github.com/chrisvoncsefalvay/skillman/blob/main/UV_QUICKSTART.md)
+            - [Windows Permissions Fix](https://github.com/chrisvoncsefalvay/skillman/blob/main/WINDOWS_PERMISSIONS_FIX.md)
+
+            ## Notes
+
+            - This release was automatically created from git tag `${{ github.ref_name }}`
+            - All artifacts are automatically built and tested
+            - Distribution to PyPI is handled separately by the publish-pypi workflow

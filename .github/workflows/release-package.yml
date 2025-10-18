@@ -1,0 +1,136 @@
+name: Package Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  package:
+    name: Create release packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Build distributions
+        run: python -m build
+
+      - name: Create source zip
+        run: |
+          mkdir -p release-artifacts
+          zip -r release-artifacts/skillman-source.zip skillman/ pyproject.toml README.md LICENSE MANIFEST.in -x "*/.*" "*/__pycache__/*" "*.egg-info/*"
+
+      - name: Create distribution zip
+        run: |
+          mkdir -p release-artifacts/dist
+          cp dist/* release-artifacts/dist/
+          cd release-artifacts
+          zip -r skillman-distributions.zip dist/
+
+      - name: Create comprehensive release package
+        run: |
+          mkdir -p skillman-release
+          cp -r skillman/ skillman-release/
+          cp pyproject.toml README.md LICENSE MANIFEST.in skillman-release/
+          cp PUBLISHING.md DEPLOYMENT.md UV_QUICKSTART.md WINDOWS_PERMISSIONS_FIX.md skillman-release/
+          cd skillman-release
+          zip -r ../release-artifacts/skillman-${{ github.event.release.tag_name }}-full.zip .
+
+      - name: Create standalone CLI package (Windows)
+        run: |
+          python -m pip install pyinstaller
+          pyinstaller --onefile --name skillman --distpath release-artifacts/standalone-windows skillman/cli.py
+        continue-on-error: true
+
+      - name: Create standalone CLI package (macOS)
+        run: |
+          python -m pip install pyinstaller
+          pyinstaller --onefile --name skillman --distpath release-artifacts/standalone-macos skillman/cli.py
+        continue-on-error: true
+
+      - name: Create standalone CLI package (Linux)
+        run: |
+          python -m pip install pyinstaller
+          pyinstaller --onefile --name skillman --distpath release-artifacts/standalone-linux skillman/cli.py
+        continue-on-error: true
+
+      - name: Generate checksums
+        run: |
+          cd release-artifacts
+          find . -type f ! -name "*.zip" ! -path "*/standalone-*" -exec sha256sum {} \; > CHECKSUMS.txt
+
+      - name: Generate release manifest
+        run: |
+          cat > release-artifacts/MANIFEST.txt << 'EOF'
+          Skillman Release: ${{ github.event.release.tag_name }}
+          Released: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+
+          Distribution Files:
+          - skillman-${{ github.event.release.tag_name }}-full.zip: Complete package with documentation
+          - skillman-source.zip: Source code only
+          - skillman-distributions.zip: Python distributions (wheel + source)
+          - dist/skillman-*.whl: Python wheel (install with pip)
+          - dist/skillman-*.tar.gz: Python source distribution (install with pip)
+
+          Installation:
+
+          Recommended (uv):
+            uv tool install skillman
+
+          Alternative (pip):
+            pip install skillman
+
+          From source:
+            pip install dist/skillman-*.whl
+
+          Standalone (if available):
+            Windows: Use standalone-windows/skillman.exe
+            macOS: Use standalone-macos/skillman
+            Linux: Use standalone-linux/skillman
+
+          Verification:
+            sha256sum -c CHECKSUMS.txt
+
+          For more information, see README.md or PUBLISHING.md
+          EOF
+
+      - name: List release artifacts
+        run: |
+          echo "Release artifacts created:"
+          ls -lh release-artifacts/
+
+      - name: Upload artifacts to release
+        uses: softprops/action-gh-release@v1
+        if: github.event_name == 'release'
+        with:
+          files: |
+            release-artifacts/skillman-source.zip
+            release-artifacts/skillman-distributions.zip
+            release-artifacts/skillman-${{ github.event.release.tag_name }}-full.zip
+            release-artifacts/CHECKSUMS.txt
+            release-artifacts/MANIFEST.txt
+            dist/skillman-*.whl
+            dist/skillman-*.tar.gz
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifacts for inspection
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-packages
+          path: release-artifacts/
+          retention-days: 30

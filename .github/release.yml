@@ -1,0 +1,41 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+      - documentation
+      - internal
+    authors:
+      - dependabot
+      - renovate
+
+  categories:
+    - title: Breaking Changes
+      labels:
+        - breaking
+        - breaking-change
+    - title: Features
+      labels:
+        - feature
+        - enhancement
+        - new
+    - title: Bug Fixes
+      labels:
+        - bug
+        - bugfix
+        - fix
+    - title: Performance Improvements
+      labels:
+        - performance
+        - optimization
+    - title: Security
+      labels:
+        - security
+    - title: Documentation
+      labels:
+        - docs
+        - documentation
+    - title: Maintenance
+      labels:
+        - maintenance
+        - refactor
+        - dependencies
