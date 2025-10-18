@@ -80,7 +80,7 @@ jobs:
         run: twine check dist/*
 
       - name: Upload distribution artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: distribution
           path: dist/
