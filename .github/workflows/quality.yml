@@ -51,7 +51,7 @@ jobs:
 
       - name: Verify package metadata
         run: |
-          pip install twine
+          pip install build twine
           python -m build
           twine check dist/*
 
