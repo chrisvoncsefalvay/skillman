@@ -1,0 +1,174 @@
+# Python bytecode / caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+dist/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask
+instance/
+.webassets-cache
+
+# Scrapy
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+__pypackages__/
+
+# Package managers
+.python-version
+Pipfile.lock
+
+# Task queues
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath
+*.sage.py
+
+# mkdocs
+/site
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+.spyderproject
+.spyproject
+.ropeproject
+*.sublime-project
+*.sublime-workspace
+.history/
+out/
+.vim/
+*.swp
+*.swo
+.*.swp
+.\#*
+\#*\#
+*~
+
+# OS artifacts
+.DS_Store
+.AppleDouble
+.LSOverride
+.Icon
+._*
+.Spotlight-V100
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.directory
+.Trash-*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# GitHub metadata (keep workflows/templates tracked)
+.github/
+!.github/workflows/
+!.github/ISSUE_TEMPLATE/
+!.github/pull_request_template.md
+!.github/release.yml
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+*.rej
+
+# Build artifacts
+*.o
+*.a
+*.wheel
+
+# Runtime data
+*.lock
+.cache/
+
+# Project-specific
+.claude/
+skills.lock

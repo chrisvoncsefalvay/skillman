@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "skillman"
+version = "0.3.1"
+description = "CLI tool for managing Claude skills from GitHub repositories"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Chris von Csefalvay", email = "chris@chrisvoncsefalvay.com"}
+]
+keywords = [
+    "claude",
+    "skills",
+    "cli",
+    "tool",
+    "package-manager",
+    "github",
+    "ai"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "click>=8.0.0",
+    "rich>=13.0.0",
+    "GitPython>=3.1.0",
+    "tomli>=1.2.0;python_version<'3.11'",
+    "tomli_w>=1.0.0",
+    "requests>=2.25.0",
+    "PyYAML>=6.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/chrisvoncsefalvay/skillman"
+Documentation = "https://github.com/chrisvoncsefalvay/skillman#readme"
+Repository = "https://github.com/chrisvoncsefalvay/skillman.git"
+Issues = "https://github.com/chrisvoncsefalvay/skillman/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=3.0.0",
+    "black>=22.0.0",
+    "flake8>=4.0.0",
+    "mypy>=0.950",
+]
+
+[project.scripts]
+skillman = "skillman.cli:main"
+
+[tool.setuptools]
+packages = ["skillman"]
+
+[tool.setuptools.package-data]
+skillman = ["py.typed"]
