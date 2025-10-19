@@ -1,26 +1,28 @@
 """Data models for skillman."""
 
-from dataclasses import dataclass, field, asdict
-from typing import Optional, List, Dict, Any
-from pathlib import Path
 import sys
-import yaml
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional
 
 # Handle tomli/tomllib import for different Python versions
 if sys.version_info >= (3, 11):
     import tomllib
+
     TOML_LOADS = tomllib.loads
 else:
     import tomli as tomllib
+
     TOML_LOADS = tomllib.loads
 
 import tomli_w
+
 TOML_DUMPS = tomli_w.dumps
 
 
 @dataclass
 class SkillMetadata:
     """Metadata extracted from SKILL.md front matter."""
+
     title: Optional[str] = None
     description: Optional[str] = None
     license: Optional[str] = None
@@ -33,6 +35,7 @@ class SkillMetadata:
 @dataclass
 class SkillValidationResult:
     """Result of skill validation."""
+
     is_valid: bool
     error_message: str = ""
     metadata: Optional[SkillMetadata] = None
@@ -41,6 +44,7 @@ class SkillValidationResult:
 @dataclass
 class Skill:
     """Represents a single skill definition."""
+
     name: str
     source: str
     version: str = "latest"
@@ -61,6 +65,7 @@ class Skill:
 @dataclass
 class Manifest:
     """Represents skills.toml manifest."""
+
     version: str = "1.0.0"
     skills: List[Skill] = field(default_factory=list)
 
@@ -107,7 +112,7 @@ class Manifest:
                 source=skill_data["source"],
                 version=skill_data.get("version", "latest"),
                 scope=skill_data.get("scope", "local"),
-                aliases=skill_data.get("aliases", [])
+                aliases=skill_data.get("aliases", []),
             )
             skills.append(skill)
 
@@ -119,7 +124,7 @@ class Manifest:
             "tool": {
                 "skillman": {
                     "version": self.version,
-                    "skills": [asdict(skill) for skill in self.skills]
+                    "skills": [asdict(skill) for skill in self.skills],
                 }
             }
         }
@@ -129,6 +134,7 @@ class Manifest:
 @dataclass
 class LockEntry:
     """Single entry in lock file."""
+
     name: str
     source: str
     version_spec: str  # What was requested (e.g., @latest, @1.2.3)
@@ -139,18 +145,25 @@ class LockEntry:
 @dataclass
 class LockFile:
     """Represents skills.lock for reproducibility."""
+
     version: str = "1.0.0"
     entries: Dict[str, LockEntry] = field(default_factory=dict)
 
-    def set_entry(self, name: str, source: str, version_spec: str,
-                  resolved_sha: str, resolved_version: str):
+    def set_entry(
+        self,
+        name: str,
+        source: str,
+        version_spec: str,
+        resolved_sha: str,
+        resolved_version: str,
+    ):
         """Set lock entry."""
         self.entries[name] = LockEntry(
             name=name,
             source=source,
             version_spec=version_spec,
             resolved_sha=resolved_sha,
-            resolved_version=resolved_version
+            resolved_version=resolved_version,
         )
 
     def get_entry(self, name: str) -> Optional[LockEntry]:
@@ -175,7 +188,7 @@ class LockFile:
                 source=entry_data["source"],
                 version_spec=entry_data["version_spec"],
                 resolved_sha=entry_data["resolved_sha"],
-                resolved_version=entry_data["resolved_version"]
+                resolved_version=entry_data["resolved_version"],
             )
             entries[name] = entry
 
@@ -189,13 +202,8 @@ class LockFile:
                 "source": entry.source,
                 "version_spec": entry.version_spec,
                 "resolved_sha": entry.resolved_sha,
-                "resolved_version": entry.resolved_version
+                "resolved_version": entry.resolved_version,
             }
 
-        data = {
-            "lock": {
-                "version": self.version,
-                "entries": entries_dict
-            }
-        }
+        data = {"lock": {"version": self.version, "entries": entries_dict}}
         return TOML_DUMPS(data)

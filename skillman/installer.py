@@ -12,21 +12,21 @@ class SkillInstaller:
 
     # Directories and patterns to exclude during installation
     IGNORE_PATTERNS = {
-        '.git',
-        '.github',
-        '.gitignore',
-        '.gitattributes',
-        '__pycache__',
-        '.pytest_cache',
-        '.mypy_cache',
-        '.coverage',
-        'node_modules',
-        '.venv',
-        'venv',
-        '.env',
-        '*.egg-info',
-        '.DS_Store',
-        'Thumbs.db',
+        ".git",
+        ".github",
+        ".gitignore",
+        ".gitattributes",
+        "__pycache__",
+        ".pytest_cache",
+        ".mypy_cache",
+        ".coverage",
+        "node_modules",
+        ".venv",
+        "venv",
+        ".env",
+        "*.egg-info",
+        ".DS_Store",
+        "Thumbs.db",
     }
 
     @staticmethod
@@ -43,7 +43,7 @@ class SkillInstaller:
             # Check pattern matches
             else:
                 for pattern in SkillInstaller.IGNORE_PATTERNS:
-                    if pattern.startswith('*') and name.endswith(pattern[1:]):
+                    if pattern.startswith("*") and name.endswith(pattern[1:]):
                         ignored.add(name)
                         break
         return ignored
@@ -52,6 +52,7 @@ class SkillInstaller:
     def _remove_readonly(func, path, excinfo):
         """Error handler for shutil operations to handle read-only files."""
         import stat
+
         try:
             if not os.access(path, os.W_OK):
                 # Add write permissions and retry
@@ -74,8 +75,9 @@ class SkillInstaller:
             raise ValueError(f"Invalid scope: {scope}")
 
     @staticmethod
-    def install_skill(skill_path: Path, skill_name: str, scope: str,
-                      force: bool = False) -> Tuple[bool, str]:
+    def install_skill(
+        skill_path: Path, skill_name: str, scope: str, force: bool = False
+    ) -> Tuple[bool, str]:
         """Install skill to target location.
 
         Returns tuple of (success, message).
@@ -85,7 +87,10 @@ class SkillInstaller:
 
         # Check if already exists
         if target_path.exists() and not force:
-            return False, f"Skill already installed at {target_path}. Use --force to overwrite."
+            return (
+                False,
+                f"Skill already installed at {target_path}. Use --force to overwrite.",
+            )
 
         try:
             # Create temp directory for atomic operation
@@ -98,18 +103,21 @@ class SkillInstaller:
                         skill_path,
                         temp_path,
                         ignore=SkillInstaller._ignore_patterns,
-                        dirs_exist_ok=False
+                        dirs_exist_ok=False,
                     )
                 else:
                     temp_path.mkdir(parents=True)
                     for item in skill_path.iterdir():
                         if item.is_file():
                             shutil.copy2(item, temp_path)
-                        elif item.is_dir() and item.name not in SkillInstaller.IGNORE_PATTERNS:
+                        elif (
+                            item.is_dir()
+                            and item.name not in SkillInstaller.IGNORE_PATTERNS
+                        ):
                             shutil.copytree(
                                 item,
                                 temp_path / item.name,
-                                ignore=SkillInstaller._ignore_patterns
+                                ignore=SkillInstaller._ignore_patterns,
                             )
 
                 # Remove existing if forcing

@@ -1,14 +1,16 @@
 """Utility funx for skillman."""
 
-from pathlib import Path
-from typing import Tuple, Optional
 import sys
+from pathlib import Path
+from typing import Optional
 
 if sys.version_info >= (3, 11):
     import tomllib
+
     TOML_LOADS = tomllib.loads
 else:
     import tomli as tomllib
+
     TOML_LOADS = tomllib.loads
 
 from skillman.models import Manifest, LockFile
@@ -114,9 +116,12 @@ def get_skill_description(skill_path: Path) -> Optional[str]:
         return None
 
 
-def parse_status(manifest_exists: bool, installed_exists: bool,
-                 manifest_version: Optional[str],
-                 installed_version: Optional[str]) -> str:
+def parse_status(
+    manifest_exists: bool,
+    installed_exists: bool,
+    manifest_version: Optional[str],
+    installed_version: Optional[str],
+) -> str:
     """Determine skill status."""
     if not manifest_exists and installed_exists:
         return "orphaned"

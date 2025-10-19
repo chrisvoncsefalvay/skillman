@@ -6,9 +6,11 @@ import sys
 
 if sys.version_info >= (3, 11):
     import tomllib
+
     TOML_LOADS = tomllib.loads
 else:
     import tomli as tomllib
+
     TOML_LOADS = tomllib.loads
 
 import tomli_w

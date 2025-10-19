@@ -29,7 +29,9 @@ class SkillSpec:
         # Parse repository and folder
         parts = self.spec_without_version.split("/")
         if len(parts) < 2:
-            raise ValueError(f"Invalid skill spec: {spec}. Expected 'username/repo' or 'username/repo/folder/...'.")
+            raise ValueError(
+                f"Invalid skill spec: {spec}. Expected 'username/repo' or 'username/repo/folder/...'."
+            )
 
         self.username = parts[0]
         self.repo = parts[1]
@@ -92,9 +94,13 @@ class GitHubClient:
                 try:
                     # Try as tag first
                     cmd = ["git", "-C", str(target_dir), "checkout", version]
-                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+                    result = subprocess.run(
+                        cmd, capture_output=True, text=True, timeout=60
+                    )
                     if result.returncode != 0:
-                        raise RuntimeError(f"Failed to checkout {version}: {result.stderr}")
+                        raise RuntimeError(
+                            f"Failed to checkout {version}: {result.stderr}"
+                        )
                 except Exception as e:
                     raise RuntimeError(f"Failed to checkout version {version}: {e}")
 
@@ -110,10 +116,19 @@ class GitHubClient:
             resolved_version = version
             if version != "latest":
                 try:
-                    cmd = ["git", "-C", str(target_dir), "describe", "--tags", "--exact-match"]
-                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+                    cmd = [
+                        "git",
+                        "-C",
+                        str(target_dir),
+                        "describe",
+                        "--tags",
+                        "--exact-match",
+                    ]
+                    result = subprocess.run(
+                        cmd, capture_output=True, text=True, timeout=60
+                    )
                     if result.returncode == 0:
-                        resolved_version = result.stdout.strip()
+                        pass  # Version tag resolved successfully
                 except Exception:
                     pass
 
@@ -125,7 +140,9 @@ class GitHubClient:
                 shutil.rmtree(target_dir)
             raise RuntimeError(f"Failed to clone repository: {e}")
 
-    def fetch_skill(self, spec: SkillSpec, target_dir: Optional[Path] = None) -> Tuple[Path, str]:
+    def fetch_skill(
+        self, spec: SkillSpec, target_dir: Optional[Path] = None
+    ) -> Tuple[Path, str]:
         """Fetch skill from GitHub.
 
         Returns tuple of (skill_path, resolved_sha).
@@ -182,7 +199,9 @@ class SkillValidator:
             return None, content
 
     @staticmethod
-    def _extract_metadata(skill_path: Path, yaml_dict: Optional[dict], content: str) -> SkillMetadata:
+    def _extract_metadata(
+        skill_path: Path, yaml_dict: Optional[dict], content: str
+    ) -> SkillMetadata:
         """Extract metadata from YAML front matter and content."""
         metadata = SkillMetadata()
 
@@ -195,8 +214,17 @@ class SkillValidator:
             metadata.tags = yaml_dict.get("tags", [])
 
             # Store any extra fields
-            known_fields = {"title", "description", "license", "author", "version", "tags"}
-            metadata.extra = {k: v for k, v in yaml_dict.items() if k not in known_fields}
+            known_fields = {
+                "title",
+                "description",
+                "license",
+                "author",
+                "version",
+                "tags",
+            }
+            metadata.extra = {
+                k: v for k, v in yaml_dict.items() if k not in known_fields
+            }
 
         # If no description from YAML, try to extract first paragraph from markdown
         if not metadata.description and content.strip():
@@ -218,15 +246,14 @@ class SkillValidator:
         if not skill_path.is_dir():
             return SkillValidationResult(
                 is_valid=False,
-                error_message=f"Skill path is not a directory: {skill_path}"
+                error_message=f"Skill path is not a directory: {skill_path}",
             )
 
         # Check for SKILL.md
         skill_md = skill_path / "SKILL.md"
         if not skill_md.exists():
             return SkillValidationResult(
-                is_valid=False,
-                error_message="Skill must contain SKILL.md in root"
+                is_valid=False, error_message="Skill must contain SKILL.md in root"
             )
 
         # Check for readable content and parse metadata
@@ -234,24 +261,24 @@ class SkillValidator:
             content = skill_md.read_text(encoding="utf-8")
             if not content.strip():
                 return SkillValidationResult(
-                    is_valid=False,
-                    error_message="SKILL.md is empty"
+                    is_valid=False, error_message="SKILL.md is empty"
                 )
 
             # Parse YAML front matter
-            yaml_dict, remaining_content = SkillValidator._parse_yaml_frontmatter(content)
+            yaml_dict, remaining_content = SkillValidator._parse_yaml_frontmatter(
+                content
+            )
 
             # Extract metadata
-            metadata = SkillValidator._extract_metadata(skill_path, yaml_dict, remaining_content)
+            metadata = SkillValidator._extract_metadata(
+                skill_path, yaml_dict, remaining_content
+            )
 
             return SkillValidationResult(
-                is_valid=True,
-                error_message="",
-                metadata=metadata
+                is_valid=True, error_message="", metadata=metadata
             )
 
         except Exception as e:
             return SkillValidationResult(
-                is_valid=False,
-                error_message=f"Failed to read SKILL.md: {e}"
+                is_valid=False, error_message=f"Failed to read SKILL.md: {e}"
             )

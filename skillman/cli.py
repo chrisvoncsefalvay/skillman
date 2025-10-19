@@ -1,19 +1,19 @@
 """CLI interface for skillman."""
 
 import sys
+import tempfile
 from pathlib import Path
 from typing import Optional
+
 import click
 from rich.console import Console
 from rich.table import Table
-import tempfile
-import shutil
 
-from skillman.models import Skill, Manifest, LockFile, SkillMetadata, SkillValidationResult
 from skillman.config import ConfigManager
 from skillman.github import SkillSpec, GitHubClient, SkillValidator
 from skillman.installer import SkillInstaller
-from skillman.utils import ManifestFile, LockFileManager, get_skill_description, parse_status
+from skillman.models import Skill
+from skillman.utils import LockFileManager, ManifestFile
 
 
 # Console for output
@@ -46,13 +46,27 @@ def init():
 
 @main.command()
 @click.argument("skill_spec")
-@click.option("-s", "--scope", type=click.Choice(["local", "user"]), default="local",
-              help="Installation scope (default: local)")
+@click.option(
+    "-s",
+    "--scope",
+    type=click.Choice(["local", "user"]),
+    default="local",
+    help="Installation scope (default: local)",
+)
 @click.option("--no-verify", is_flag=True, help="Skip skill validation")
 @click.option("--force", is_flag=True, help="Overwrite existing skill")
-@click.option("--dangerously-skip-permissions", is_flag=True,
-              help="Skip permission warnings (not recommended)")
-def add(skill_spec: str, scope: str, no_verify: bool, force: bool, dangerously_skip_permissions: bool):
+@click.option(
+    "--dangerously-skip-permissions",
+    is_flag=True,
+    help="Skip permission warnings (not recommended)",
+)
+def add(
+    skill_spec: str,
+    scope: str,
+    no_verify: bool,
+    force: bool,
+    dangerously_skip_permissions: bool,
+):
     """Add and install a skill from GitHub."""
     try:
         # Parse skill specification
@@ -64,7 +78,9 @@ def add(skill_spec: str, scope: str, no_verify: bool, force: bool, dangerously_s
 
         # Show security warning unless skipped
         if not dangerously_skip_permissions:
-            console.print("[yellow]Security warning: Skills can execute code and access system resources.[/yellow]")
+            console.print(
+                "[yellow]Security warning: Skills can execute code and access system resources.[/yellow]"
+            )
             console.print()
             console.print("Before installing a skill, please consider:")
             console.print("  - Install only from trusted sources")
@@ -72,8 +88,12 @@ def add(skill_spec: str, scope: str, no_verify: bool, force: bool, dangerously_s
             console.print("  - Skills can read, create, or modify files")
             console.print("  - Skills can execute system commands")
             console.print()
-            console.print("For more information on skill security and permissions, see:")
-            console.print("  https://support.claude.com/en/articles/12512180-using-skills-in-claude#h_2746475e70")
+            console.print(
+                "For more information on skill security and permissions, see:"
+            )
+            console.print(
+                "  https://support.claude.com/en/articles/12512180-using-skills-in-claude#h_2746475e70"
+            )
             console.print()
 
             if not click.confirm("Do you want to continue installing this skill?"):
@@ -89,19 +109,25 @@ def add(skill_spec: str, scope: str, no_verify: bool, force: bool, dangerously_s
         github_client = GitHubClient(github_token)
 
         with tempfile.TemporaryDirectory(prefix="skillman_add_") as temp_dir:
-            skill_path, resolved_sha = github_client.fetch_skill(parsed_spec, Path(temp_dir))
+            skill_path, resolved_sha = github_client.fetch_skill(
+                parsed_spec, Path(temp_dir)
+            )
 
             # Validate skill
             if not no_verify:
                 console.print("[cyan]Validating skill...[/cyan]")
                 result = SkillValidator.validate(skill_path)
                 if not result.is_valid:
-                    console.print(f"[red]Validation failed: {result.error_message}[/red]")
+                    console.print(
+                        f"[red]Validation failed: {result.error_message}[/red]"
+                    )
                     sys.exit(1)
 
             # Install skill
             console.print(f"[cyan]Installing to {scope} scope...[/cyan]")
-            success, message = SkillInstaller.install_skill(skill_path, parsed_spec.repo, scope, force)
+            success, message = SkillInstaller.install_skill(
+                skill_path, parsed_spec.repo, scope, force
+            )
             if not success:
                 console.print(f"[red]{message}[/red]")
                 sys.exit(1)
@@ -116,7 +142,7 @@ def add(skill_spec: str, scope: str, no_verify: bool, force: bool, dangerously_s
                 name=parsed_spec.repo,
                 source=str(parsed_spec),
                 version=parsed_spec.version,
-                scope=scope
+                scope=scope,
             )
 
             # Remove existing if force
@@ -135,7 +161,7 @@ def add(skill_spec: str, scope: str, no_verify: bool, force: bool, dangerously_s
                     str(parsed_spec),
                     parsed_spec.version,
                     resolved_sha,
-                    parsed_spec.version
+                    parsed_spec.version,
                 )
                 lock_manager.write(lock_file)
 
@@ -150,8 +176,13 @@ def add(skill_spec: str, scope: str, no_verify: bool, force: bool, dangerously_s
 
 @main.command()
 @click.argument("skillname")
-@click.option("-s", "--scope", type=click.Choice(["local", "user"]), default=None,
-              help="Installation scope")
+@click.option(
+    "-s",
+    "--scope",
+    type=click.Choice(["local", "user"]),
+    default=None,
+    help="Installation scope",
+)
 @click.option("--keep-files", is_flag=True, help="Keep installed files")
 def remove(skillname: str, scope: Optional[str], keep_files: bool):
     """Remove skill from manifest and optionally filesystem."""
@@ -212,13 +243,15 @@ def verify(skill_spec: str, no_verify: bool):
         github_client = GitHubClient(github_token)
 
         with tempfile.TemporaryDirectory(prefix="skillman_verify_") as temp_dir:
-            skill_path, resolved_sha = github_client.fetch_skill(parsed_spec, Path(temp_dir))
+            skill_path, resolved_sha = github_client.fetch_skill(
+                parsed_spec, Path(temp_dir)
+            )
 
             # Validate
             result = SkillValidator.validate(skill_path)
 
             if result.is_valid:
-                console.print(f"[green]Valid skill[/green]")
+                console.print("[green]Valid skill[/green]")
                 console.print(f"  Repository: {parsed_spec.repo_url}")
                 console.print(f"  Path: {parsed_spec.skill_path}")
                 console.print(f"  Resolved SHA: {resolved_sha}")
@@ -246,8 +279,13 @@ def verify(skill_spec: str, no_verify: bool):
 
 
 @main.command(name="list")
-@click.option("-s", "--scope", type=click.Choice(["local", "user"]), default=None,
-              help="Show only specified scope")
+@click.option(
+    "-s",
+    "--scope",
+    type=click.Choice(["local", "user"]),
+    default=None,
+    help="Show only specified scope",
+)
 def cmd_list(scope: Optional[str]):
     """List installed skills with status."""
     try:
@@ -263,7 +301,9 @@ def cmd_list(scope: Optional[str]):
         table.add_column("Status")
 
         # Get installed skills
-        installed = {name: path for name, path in SkillInstaller.list_installed_skills(scope)}
+        installed = {
+            name: path for name, path in SkillInstaller.list_installed_skills(scope)
+        }
 
         # Add manifest skills
         shown = set()
@@ -284,11 +324,7 @@ def cmd_list(scope: Optional[str]):
                     installed_version = lock_file.entries[skill.name].resolved_version
 
             table.add_row(
-                skill.name,
-                skill.version,
-                installed_version,
-                skill.scope,
-                status
+                skill.name, skill.version, installed_version, skill.scope, status
             )
 
         # Add orphaned skills
@@ -384,8 +420,11 @@ def update(skillname: Optional[str], all: bool, dry_run: bool):
             console.print("[cyan]Dry run - no changes will be made[/cyan]")
 
         for skill in skills_to_update:
-            console.print(f"[cyan]Would update {skill.name} to {skill.version}[/cyan]" if dry_run
-                         else f"[cyan]Updating {skill.name}...[/cyan]")
+            console.print(
+                f"[cyan]Would update {skill.name} to {skill.version}[/cyan]"
+                if dry_run
+                else f"[cyan]Updating {skill.name}...[/cyan]"
+            )
 
             if not dry_run:
                 # Fetch and install
@@ -395,18 +434,30 @@ def update(skillname: Optional[str], all: bool, dry_run: bool):
 
                 parsed_spec = SkillSpec(skill.source)
                 with tempfile.TemporaryDirectory(prefix="skillman_update_") as temp_dir:
-                    skill_path, resolved_sha = github_client.fetch_skill(parsed_spec, Path(temp_dir))
-                    success, message = SkillInstaller.install_skill(skill_path, skill.name, skill.scope, force=True)
+                    skill_path, resolved_sha = github_client.fetch_skill(
+                        parsed_spec, Path(temp_dir)
+                    )
+                    success, message = SkillInstaller.install_skill(
+                        skill_path, skill.name, skill.scope, force=True
+                    )
 
                     if success:
                         # Update lock file
                         lock_manager = LockFileManager(Path("skills.lock"))
                         lock_file = lock_manager.read_or_create()
-                        lock_file.set_entry(skill.name, skill.source, skill.version, resolved_sha, skill.version)
+                        lock_file.set_entry(
+                            skill.name,
+                            skill.source,
+                            skill.version,
+                            resolved_sha,
+                            skill.version,
+                        )
                         lock_manager.write(lock_file)
                         console.print(f"[green]Updated {skill.name}[/green]")
                     else:
-                        console.print(f"[red]Failed to update {skill.name}: {message}[/red]")
+                        console.print(
+                            f"[red]Failed to update {skill.name}: {message}[/red]"
+                        )
 
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
@@ -424,7 +475,9 @@ def fetch(dry_run: bool, yes: bool):
 
 @main.command()
 @click.option("--up", is_flag=True, help="Update skills to latest matching constraints")
-@click.option("--down", is_flag=True, help="Add installed-but-unlisted skills to manifest")
+@click.option(
+    "--down", is_flag=True, help="Add installed-but-unlisted skills to manifest"
+)
 @click.option("-y", "--yes", is_flag=True, help="Don't prompt for confirmation")
 @click.option("--dry-run", is_flag=True, help="Show what would happen")
 def sync(up: bool, down: bool, yes: bool, dry_run: bool):
@@ -443,8 +496,11 @@ def sync(up: bool, down: bool, yes: bool, dry_run: bool):
         for skill in manifest.skills:
             installed_path = SkillInstaller.get_skill_path(skill.name, skill.scope)
             if not installed_path:
-                console.print(f"[cyan]Would install {skill.name}[/cyan]" if dry_run
-                             else f"[cyan]Installing {skill.name}...[/cyan]")
+                console.print(
+                    f"[cyan]Would install {skill.name}[/cyan]"
+                    if dry_run
+                    else f"[cyan]Installing {skill.name}...[/cyan]"
+                )
 
                 if not dry_run:
                     config = ConfigManager()
@@ -452,12 +508,24 @@ def sync(up: bool, down: bool, yes: bool, dry_run: bool):
                     github_client = GitHubClient(github_token)
 
                     parsed_spec = SkillSpec(skill.source)
-                    with tempfile.TemporaryDirectory(prefix="skillman_sync_") as temp_dir:
-                        skill_path, resolved_sha = github_client.fetch_skill(parsed_spec, Path(temp_dir))
-                        success, message = SkillInstaller.install_skill(skill_path, skill.name, skill.scope)
+                    with tempfile.TemporaryDirectory(
+                        prefix="skillman_sync_"
+                    ) as temp_dir:
+                        skill_path, resolved_sha = github_client.fetch_skill(
+                            parsed_spec, Path(temp_dir)
+                        )
+                        success, message = SkillInstaller.install_skill(
+                            skill_path, skill.name, skill.scope
+                        )
                         if success:
                             console.print(f"[green]Installed {skill.name}[/green]")
-                            lock_file.set_entry(skill.name, skill.source, skill.version, resolved_sha, skill.version)
+                            lock_file.set_entry(
+                                skill.name,
+                                skill.source,
+                                skill.version,
+                                resolved_sha,
+                                skill.version,
+                            )
                         else:
                             console.print(f"[red]Failed: {message}[/red]")
 
@@ -467,8 +535,11 @@ def sync(up: bool, down: bool, yes: bool, dry_run: bool):
             installed = SkillInstaller.list_installed_skills()
             for name, path in installed:
                 if not manifest.has_skill(name):
-                    console.print(f"[cyan]Would add {name} to manifest[/cyan]" if dry_run
-                                 else f"[cyan]Adding {name} to manifest...[/cyan]")
+                    console.print(
+                        f"[cyan]Would add {name} to manifest[/cyan]"
+                        if dry_run
+                        else f"[cyan]Adding {name} to manifest...[/cyan]"
+                    )
 
                     if not dry_run:
                         skill = Skill(name=name, source="unknown", scope="local")
@@ -486,8 +557,13 @@ def sync(up: bool, down: bool, yes: bool, dry_run: bool):
 
 
 @main.command()
-@click.option("-s", "--scope", type=click.Choice(["local", "user"]), default=None,
-              help="Clean only specified scope")
+@click.option(
+    "-s",
+    "--scope",
+    type=click.Choice(["local", "user"]),
+    default=None,
+    help="Clean only specified scope",
+)
 @click.option("--dry-run", is_flag=True, help="Show what would happen")
 @click.option("-y", "--yes", is_flag=True, help="Don't prompt for confirmation")
 def clean(scope: Optional[str], dry_run: bool, yes: bool):
