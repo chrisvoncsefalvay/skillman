@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "skillman"
-version = "0.3.1"
+version = "0.3.2"
 description = "CLI tool for managing Claude skills from GitHub repositories"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.8"
-license = {text = "MIT"}
 authors = [
     {name = "Chris von Csefalvay", email = "chris@chrisvoncsefalvay.com"}
 ]
@@ -25,7 +25,6 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
@@ -68,6 +67,7 @@ skillman = "skillman.cli:main"
 
 [tool.setuptools]
 packages = ["skillman"]
+license-files = []
 
 [tool.setuptools.package-data]
 skillman = ["py.typed"]

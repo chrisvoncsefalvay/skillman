@@ -1,13 +1,13 @@
 """GitHub integration for skillman."""
 
 import os
-import re
-from pathlib import Path
-from typing import Optional, Tuple
-import tempfile
 import shutil
 import subprocess
+import tempfile
+from pathlib import Path
+from typing import Optional, Tuple
 from urllib.parse import urlparse
+
 import yaml
 
 from skillman.models import SkillMetadata, SkillValidationResult
@@ -113,7 +113,6 @@ class GitHubClient:
             resolved_sha = result.stdout.strip()
 
             # Get version tag if checking out a tag
-            resolved_version = version
             if version != "latest":
                 try:
                     cmd = [
