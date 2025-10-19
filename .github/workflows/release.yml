@@ -90,10 +90,6 @@ jobs:
             ## Documentation
 
             - [README](https://github.com/chrisvoncsefalvay/skillman#readme)
-            - [Installation Guide](https://github.com/chrisvoncsefalvay/skillman/blob/main/README.md#installation)
-            - [PyPI Publishing Guide](https://github.com/chrisvoncsefalvay/skillman/blob/main/PUBLISHING.md)
-            - [UV Quick Start](https://github.com/chrisvoncsefalvay/skillman/blob/main/UV_QUICKSTART.md)
-            - [Windows Permissions Fix](https://github.com/chrisvoncsefalvay/skillman/blob/main/WINDOWS_PERMISSIONS_FIX.md)
 
             ## Notes
 
