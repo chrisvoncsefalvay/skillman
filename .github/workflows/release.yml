@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: write
-  id-token: write
 
 jobs:
   create-release:
@@ -97,8 +96,8 @@ jobs:
             - All artifacts are automatically built and tested
             - Distribution to PyPI is handled separately by the publish-pypi workflow
 
-
-  publish-pypi:
-    name: Publish to PyPI
-    needs: create-release
-    uses: ./.github/workflows/publish-pypi.yml
+      - name: Trigger PyPI publish workflow
+        run: |
+          gh workflow run publish-pypi.yml --ref ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PAT }}
