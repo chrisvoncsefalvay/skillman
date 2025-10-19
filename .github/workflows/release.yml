@@ -99,3 +99,9 @@ jobs:
             - This release was automatically created from git tag `${{ github.ref_name }}`
             - All artifacts are automatically built and tested
             - Distribution to PyPI is handled separately by the publish-pypi workflow
+
+      - name: Trigger PyPI publish workflow
+        run: |
+          gh workflow run publish-pypi.yml --ref ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
