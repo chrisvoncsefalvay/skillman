@@ -9,6 +9,9 @@ jobs:
   deploy:
     name: Deploy to PyPI
     runs-on: ubuntu-latest
+    
+    permissions:
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -41,6 +44,9 @@ jobs:
     runs-on: ubuntu-latest
     # Only run on release events (not pull requests)
     if: github.event_name == 'release'
+
+    permissions:
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
