@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=75.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,6 +8,7 @@ version = "0.3.2"
 description = "CLI tool for managing Claude skills from GitHub repositories"
 readme = "README.md"
 license = "MIT"
+license-files = []
 requires-python = ">=3.8"
 authors = [
     {name = "Chris von Csefalvay", email = "chris@chrisvoncsefalvay.com"}
@@ -67,7 +68,6 @@ skillman = "skillman.cli:main"
 
 [tool.setuptools]
 packages = ["skillman"]
-license-files = []
 
 [tool.setuptools.package-data]
 skillman = ["py.typed"]
