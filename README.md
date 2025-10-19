@@ -1,4 +1,12 @@
-# skillman: CLI tool for managing Claude skills
+# skillman: a CLI for managing Claude skills
+
+
+ ███████╗ ██╗  ██╗ ██╗ ██╗      ██╗      ███╗   ███╗  █████╗  ███╗   ██╗
+ ██╔════╝ ██║ ██╔╝ ██║ ██║      ██║      ████╗ ████║ ██╔══██╗ ████╗  ██║
+ ███████╗ █████╔╝  ██║ ██║      ██║      ██╔████╔██║ ███████║ ██╔██╗ ██║
+ ╚════██║ ██╔═██╗  ██║ ██║      ██║      ██║╚██╔╝██║ ██╔══██║ ██║╚██╗██║
+ ███████║ ██║  ██╗ ██║ ███████╗ ███████╗ ██║ ╚═╝ ██║ ██║  ██║ ██║ ╚████║
+ ╚══════╝ ╚═╝  ╚═╝ ╚═╝ ╚══════╝ ╚══════╝ ╚═╝     ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═══╝
 
 [![Tests and Build](https://github.com/chrisvoncsefalvay/skillman/workflows/Tests%20and%20Build/badge.svg)](https://github.com/chrisvoncsefalvay/skillman/actions/workflows/tests.yml)
 [![Code Quality](https://github.com/chrisvoncsefalvay/skillman/workflows/Code%20Quality%20Checks/badge.svg)](https://github.com/chrisvoncsefalvay/skillman/actions/workflows/quality.yml)
@@ -6,7 +14,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PyPI](https://img.shields.io/badge/PyPI-skillman-orange)](https://pypi.org/project/skillman/)
 
-A Python CLI tool for managing Claude skills from GitHub repositories. Handles installation, versioning, and synchronisation of skills across user and project scopes -- mostly gracefully.
+
+
+A Python CLI for managing Claude skills from GitHub repositories. Handles installation, versioning, and synchronisation of skills across user and project scopes -- mostly gracefully.
 
 ## Installation
 
@@ -348,4 +358,4 @@ The tool provides (mostly) clear error messages for:
 
 MIT
 
-Made with ❤️ in the Mile High City 🏔️ by [Chris von Csefalvay](https://chrisvoncsefalvay.com)
+Made with ❤️ in the Mile High City 🏔️ by [Chris von Csefalvay](https://chrisvoncsefalvay.com) and 🐶 Oliver.
