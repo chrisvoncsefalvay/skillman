@@ -45,7 +45,6 @@ jobs:
           mkdir -p skillman-release
           cp -r skillman/ skillman-release/
           cp pyproject.toml README.md LICENSE MANIFEST.in skillman-release/
-          cp PUBLISHING.md DEPLOYMENT.md UV_QUICKSTART.md WINDOWS_PERMISSIONS_FIX.md skillman-release/
           cd skillman-release
           zip -r ../release-artifacts/skillman-${{ github.event.release.tag_name }}-full.zip .
 
