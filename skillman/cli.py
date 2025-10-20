@@ -487,9 +487,7 @@ def update(skillname: Optional[str], all: bool, dry_run: bool):
                                 )
                             )
                             if not success:
-                                console.print(
-                                    f"[yellow]{marketplace_message}[/yellow]"
-                                )
+                                console.print(f"[yellow]{marketplace_message}[/yellow]")
                     else:
                         console.print(
                             f"[red]Failed to update {skill.name}: {message}[/red]"
