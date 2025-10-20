@@ -10,6 +10,7 @@ from rich.console import Console
 from rich.table import Table
 
 from skillman.config import ConfigManager
+from skillman.claude_marketplace import ClaudeMarketplaceManager
 from skillman.github import SkillSpec, GitHubClient, SkillValidator
 from skillman.installer import SkillInstaller
 from skillman.models import Skill
@@ -134,6 +135,11 @@ def add(
 
             console.print(f"[green]{message}[/green]")
 
+            # Get installed skill path for marketplace registration
+            installed_skill_path = SkillInstaller.get_skill_path(
+                parsed_spec.repo, scope
+            )
+
             # Update manifest
             manifest_file = ManifestFile(Path("skills.toml"))
             manifest = manifest_file.read_or_create()
@@ -166,6 +172,21 @@ def add(
                 lock_manager.write(lock_file)
 
                 console.print("[green]Added to skills.toml[/green]")
+
+                # Register skill with Claude marketplace
+                if installed_skill_path:
+                    console.print(
+                        f"[cyan]Registering {skill.name} with Claude marketplace...[/cyan]"
+                    )
+                    success, marketplace_message = (
+                        ClaudeMarketplaceManager.add_skill_to_marketplace(
+                            installed_skill_path, skill.name
+                        )
+                    )
+                    if success:
+                        console.print(f"[green]{marketplace_message}[/green]")
+                    else:
+                        console.print(f"[yellow]{marketplace_message}[/yellow]")
             else:
                 console.print("[yellow]Skill already in manifest[/yellow]")
 
@@ -454,6 +475,21 @@ def update(skillname: Optional[str], all: bool, dry_run: bool):
                         )
                         lock_manager.write(lock_file)
                         console.print(f"[green]Updated {skill.name}[/green]")
+
+                        # Register skill with Claude marketplace
+                        installed_skill_path = SkillInstaller.get_skill_path(
+                            skill.name, skill.scope
+                        )
+                        if installed_skill_path:
+                            success, marketplace_message = (
+                                ClaudeMarketplaceManager.add_skill_to_marketplace(
+                                    installed_skill_path, skill.name
+                                )
+                            )
+                            if not success:
+                                console.print(
+                                    f"[yellow]{marketplace_message}[/yellow]"
+                                )
                     else:
                         console.print(
                             f"[red]Failed to update {skill.name}: {message}[/red]"
@@ -526,6 +562,21 @@ def sync(up: bool, down: bool, yes: bool, dry_run: bool):
                                 resolved_sha,
                                 skill.version,
                             )
+
+                            # Register skill with Claude marketplace
+                            installed_skill_path = SkillInstaller.get_skill_path(
+                                skill.name, skill.scope
+                            )
+                            if installed_skill_path:
+                                success, marketplace_message = (
+                                    ClaudeMarketplaceManager.add_skill_to_marketplace(
+                                        installed_skill_path, skill.name
+                                    )
+                                )
+                                if not success:
+                                    console.print(
+                                        f"[yellow]{marketplace_message}[/yellow]"
+                                    )
                         else:
                             console.print(f"[red]Failed: {message}[/red]")
 
