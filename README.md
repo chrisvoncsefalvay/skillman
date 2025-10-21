@@ -1,13 +1,6 @@
 # skillman: a CLI for managing Claude skills
 
 
- ███████╗ ██╗  ██╗ ██╗ ██╗      ██╗      ███╗   ███╗  █████╗  ███╗   ██╗
- ██╔════╝ ██║ ██╔╝ ██║ ██║      ██║      ████╗ ████║ ██╔══██╗ ████╗  ██║
- ███████╗ █████╔╝  ██║ ██║      ██║      ██╔████╔██║ ███████║ ██╔██╗ ██║
- ╚════██║ ██╔═██╗  ██║ ██║      ██║      ██║╚██╔╝██║ ██╔══██║ ██║╚██╗██║
- ███████║ ██║  ██╗ ██║ ███████╗ ███████╗ ██║ ╚═╝ ██║ ██║  ██║ ██║ ╚████║
- ╚══════╝ ╚═╝  ╚═╝ ╚═╝ ╚══════╝ ╚══════╝ ╚═╝     ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═══╝
-
 [![Tests and Build](https://github.com/chrisvoncsefalvay/skillman/workflows/Tests%20and%20Build/badge.svg)](https://github.com/chrisvoncsefalvay/skillman/actions/workflows/tests.yml)
 [![Code Quality](https://github.com/chrisvoncsefalvay/skillman/workflows/Code%20Quality%20Checks/badge.svg)](https://github.com/chrisvoncsefalvay/skillman/actions/workflows/quality.yml)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
